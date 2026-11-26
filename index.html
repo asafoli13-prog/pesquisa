@@ -1,112 +1,373 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Roleta Gacha Animada - Poki Style</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesquisa</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #111827;
+            color: #f9fafb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+        .card {
+            background-color: #1f2937;
+            padding: 32px 24px;
+            border-radius: 14px;
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            border: 1px solid #374151;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+        }
+        .card.ampla {
+            max-width: 640px;
+            text-align: left;
+        }
+        .barra-container {
+            width: 100%;
+            height: 6px;
+            background-color: #374151;
+            border-radius: 4px;
+            margin-bottom: 14px;
+            overflow: hidden;
+        }
+        .barra-progresso {
+            height: 100%;
+            width: 0%;
+            background-color: #3b82f6;
+            transition: width 0.25s ease;
+        }
+        .progresso-texto {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        h2 {
+            font-size: 1.4rem;
+            margin-bottom: 24px;
+            line-height: 1.35;
+            font-weight: 600;
+        }
+        .opcoes {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        button {
+            width: 100%;
+            padding: 15px 16px;
+            border-radius: 10px;
+            border: 1px solid #4b5563;
+            background-color: #111827;
+            color: #f9fafb;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.15s ease, border-color 0.15s ease;
+        }
+        button:hover {
+            background-color: #2563eb;
+            border-color: #3b82f6;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        .btn-iniciar {
+            background-color: #10b981;
+            border-color: #10b981;
+            color: #064e3b;
+            font-size: 1.15rem;
+            font-weight: 700;
+            padding: 16px;
+        }
+        .btn-iniciar:hover {
+            background-color: #059669;
+            border-color: #059669;
+            color: #ffffff;
+        }
+
+        /* Área de gráficos finais */
+        .cabecalho-resultados {
+            text-align: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #374151;
+        }
+        .cabecalho-resultados p {
+            color: #9ca3af;
+            margin-top: 6px;
+            font-size: 0.95rem;
+        }
+        .bloco-grafico {
+            background-color: #111827;
+            border: 1px solid #374151;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .titulo-grafico {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #f3f4f6;
+            margin-bottom: 12px;
+        }
+        .linha-item {
+            margin-bottom: 10px;
+        }
+        .linha-item:last-child {
+            margin-bottom: 0;
+        }
+        .linha-topo {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            margin-bottom: 4px;
+            gap: 10px;
+        }
+        .linha-valor {
+            color: #93c5fd;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .trilha-barra {
+            width: 100%;
+            height: 10px;
+            background-color: #1f2937;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .preenchimento-barra {
+            height: 100%;
+            background-color: #3b82f6;
+            border-radius: 999px;
+            transition: width 0.4s ease;
+        }
+
+        .oculto {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card" id="card-principal">
+    <!-- TELA INICIAL -->
+    <div id="tela-inicio">
+        <h2>Iniciar pesquisa?</h2>
+        <button class="btn-iniciar" id="btn-start">Sim</button>
+    </div>
+
+    <!-- TELA DAS PERGUNTAS -->
+    <div id="tela-pergunta" class="oculto">
+        <div class="barra-container">
+            <div class="barra-progresso" id="barra-visual"></div>
+        </div>
+        <div class="progresso-texto" id="contador">1 / 6</div>
+        <h2 id="texto-pergunta"></h2>
+        <div class="opcoes" id="lista-opcoes"></div>
+    </div>
+
+    <!-- TELA FINAL COM GRÁFICOS -->
+    <div id="tela-fim" class="oculto">
+        <div class="cabecalho-resultados">
+            <h2>Resultados da Pesquisa</h2>
+            <p id="resumo-total">Carregando dados...</p>
+        </div>
+        <div id="container-graficos"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    // =========================================================
+    // COLE SUAS CHAVES DO SUPABASE NAS DUAS LINHAS ABAIXO
+    // =========================================================
+    const SUPABASE_URL = 'https://ehybehqtbaistdapxvqs.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_9zVXK4I-H3tM_yTuVzC0qQ_1sgKirjt';
+
+    const perguntas = [
+        {
+            campo: 'escolaridade',
+            texto: 'De que ensino você é?',
+            opcoes: [
+                'Ensino Fundamental I (1º ao 5º ano)',
+                'Ensino Fundamental II (6º ao 9º ano)',
+                'Ensino Médio (1º ao 3º ano)',
+                'Não estudo mais / Já concluí'
+            ]
+        },
+        {
+            campo: 'genero_filme',
+            texto: 'Qual seu gênero de filme favorito?',
+            opcoes: ['Ação / Aventura', 'Comédia', 'Terror / Suspense', 'Ficção Científica', 'Animação', 'Drama / Romance']
+        },
+        {
+            campo: 'recomenda_filme',
+            texto: 'Você recomenda esse gênero de filme para alguém?',
+            opcoes: ['Sim, com certeza', 'Talvez', 'Não']
+        },
+        {
+            campo: 'genero_jogo',
+            texto: 'Qual seu gênero de jogo favorito?',
+            opcoes: ['Ação / Tiro (FPS)', 'Aventura / RPG', 'Esportes / Corrida', 'Estratégia / Simulação', 'Terror / Sobrevivência', 'Não jogo']
+        },
+        {
+            campo: 'recomenda_jogo',
+            texto: 'Você recomenda esse gênero de jogo para alguém?',
+            opcoes: ['Sim, com certeza', 'Talvez', 'Não']
+        },
+        {
+            campo: 'tipo_personagem',
+            texto: 'Qual tipo de personagem você mais gosta?',
+            opcoes: ['Protagonista (Herói)', 'Vilão / Antagonista', 'Anti-herói', 'Alívio Cômico (Engraçado)', 'Estrategista / Inteligente']
+        }
+    ];
+
+    let indiceAtual = 0;
+    const respostas = {};
+
+    document.getElementById('btn-start').addEventListener('click', function() {
+        document.getElementById('tela-inicio').classList.add('oculto');
+        document.getElementById('tela-pergunta').classList.remove('oculto');
+        mostrarPergunta();
+    });
+
+    function mostrarPergunta() {
+        const atual = perguntas[indiceAtual];
+        const porcentagem = ((indiceAtual + 1) / perguntas.length) * 100;
+
+        document.getElementById('barra-visual').style.width = porcentagem + '%';
+        document.getElementById('contador').textContent = (indiceAtual + 1) + ' / ' + perguntas.length;
+        document.getElementById('texto-pergunta').textContent = atual.texto;
+
+        const containerOpcoes = document.getElementById('lista-opcoes');
+        containerOpcoes.innerHTML = '';
+
+        for (let i = 0; i < atual.opcoes.length; i++) {
+            const opcao = atual.opcoes[i];
+            const btn = document.createElement('button');
+            btn.textContent = opcao;
+            btn.addEventListener('click', function() {
+                selecionarOpcao(atual.campo, opcao);
+            });
+            containerOpcoes.appendChild(btn);
+        }
     }
-    body {
-      width: 100vw;
-      height: 100vh;
-      background: #090a10;
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
+
+    async function selecionarOpcao(campo, valor) {
+        respostas[campo] = valor;
+        indiceAtual++;
+
+        if (indiceAtual < perguntas.length) {
+            mostrarPergunta();
+        } else {
+            await finalizarPesquisa();
+        }
     }
-    .container {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      gap: 4vw;
-      width: 100vw;
-      height: 100vh;
-      padding: 10px;
-      transition: all 0.5s ease;
+
+    async function finalizarPesquisa() {
+        document.getElementById('lista-opcoes').innerHTML = '';
+        document.getElementById('texto-pergunta').textContent = 'Salvando respostas e gerando gráficos...';
+
+        try {
+            if (!window.supabase || SUPABASE_URL.includes('COLE_SUA_URL')) {
+                throw new Error('Chaves do Supabase não configuradas.');
+            }
+
+            const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+            // 1. Envia o voto atual para a tabela 'votos'
+            const { error: erroInserir } = await db.from('votos').insert([respostas]);
+            if (erroInserir) {
+                throw new Error('Erro ao salvar voto: ' + erroInserir.message);
+            }
+
+            // 2. Busca todos os votos salvos para montar os gráficos
+            const { data: todosVotos, error: erroBuscar } = await db.from('votos').select('*');
+            if (erroBuscar) {
+                throw new Error('Erro ao carregar gráficos: ' + erroBuscar.message);
+            }
+
+            renderizarGraficos(todosVotos || []);
+
+            document.getElementById('tela-pergunta').classList.add('oculto');
+            document.getElementById('card-principal').classList.add('ampla');
+            document.getElementById('tela-fim').classList.remove('oculto');
+        } catch (err) {
+            alert('Atenção: ' + err.message);
+        }
     }
-    .wheel-box {
-      position: relative;
-      width: min(55vw, 82vh);
-      height: min(55vw, 82vh);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: transform 0.5s ease;
+
+    function renderizarGraficos(registros) {
+        const totalParticipantes = registros.length;
+        document.getElementById('resumo-total').textContent =
+            'Total de respostas acumuladas: ' + totalParticipantes + (totalParticipantes === 1 ? ' pessoa' : ' pessoas');
+
+        const container = document.getElementById('container-graficos');
+        container.innerHTML = '';
+
+        perguntas.forEach(function(pergunta) {
+            const contagem = {};
+
+            // Inicializa todas as opções com 0
+            pergunta.opcoes.forEach(function(op) {
+                contagem[op] = 0;
+            });
+
+            // Conta cada resposta registrada no banco
+            registros.forEach(function(linha) {
+                const valor = linha[pergunta.campo];
+                if (valor) {
+                    contagem[valor] = (contagem[valor] || 0) + 1;
+                }
+            });
+
+            // Ordena do maior número de votos para o menor
+            const itensOrdenados = Object.entries(contagem).sort(function(a, b) {
+                return b[1] - a[1];
+            });
+
+            let htmlLinhas = '';
+            itensOrdenados.forEach(function(par) {
+                const opcaoNome = par[0];
+                const qtd = par[1];
+                const pct = totalParticipantes > 0 ? ((qtd / totalParticipantes) * 100).toFixed(1) : '0.0';
+
+                htmlLinhas += `
+                    <div class="linha-item">
+                        <div class="linha-topo">
+                            <span>${opcaoNome}</span>
+                            <span class="linha-valor">${qtd} ${qtd === 1 ? 'pessoa' : 'pessoas'} (${pct}%)</span>
+                        </div>
+                        <div class="trilha-barra">
+                            <div class="preenchimento-barra" style="width: ${pct}%;"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML += `
+                <div class="bloco-grafico">
+                    <div class="titulo-grafico">${pergunta.texto}</div>
+                    ${htmlLinhas}
+                </div>
+            `;
+        });
     }
-    canvas {
-      width: 100%;
-      height: 100%;
-      filter: drop-shadow(0 0 15px rgba(255, 71, 87, 0.3));
-      transition: filter 0.5s ease;
-    }
-    .pointer {
-      position: absolute;
-      top: -8px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 12px solid transparent;
-      border-right: 12px solid transparent;
-      border-top: 24px solid #ff4757;
-      z-index: 10;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
-    }
-    .panel {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      background: #141726;
-      padding: 15px;
-      border-radius: 14px;
-      border: 1px solid #2a2f4c;
-      width: min(38vw, 280px);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      transition: all 0.4s ease;
-    }
-    h2 {
-      color: #ffd32a;
-      font-size: 1rem;
-      text-transform: uppercase;
-      text-align: center;
-      letter-spacing: 1px;
-    }
-    .result-box {
-      background: #090a10;
-      border: 2px solid #ff4757;
-      border-radius: 8px;
-      padding: 10px;
-      text-align: center;
-      width: 100%;
-      transition: border-color 0.4s ease;
-    }
-    .race-title {
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: #fff;
-    }
-    .race-chance {
-      font-size: 0.75rem;
-      color: #a4b0be;
-      margin-top: 3px;
-    }
-    .btn {
-      width: 100%;
-      padding: 12px;
-      font-size: 1rem;
-      font-weight: bold;
-      color: #fff;
-      background: linear-gradient(135deg, #ff4757, #ff6b81);
-      border: none;
-      border-radius: 8px;
-      cursor: pointer
+</script>
+
+</body>
+</html>
+
